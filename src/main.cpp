@@ -4,7 +4,7 @@
 #include "CPigBotao.h"
 #include "CPigCaixaTexto.h"
 #include "CPigCampoTexto.h"
-//#include "CPigCampoSenha.h"
+#include "CPigCampoSenha.h"
 //#include "CPigAreaDeTexto.h"
 #include "CPigCheckBox.h"
 
@@ -37,7 +37,7 @@ int main( int argc, char* args[] ){
    // CPigAreaDeTexto *At = new CPigAreaDeTexto(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0,GetTamanhoFonte(fonteTexto)+30,larg - (margemHorEsq + margemHorDir),true,false);
 
 
-    CPigCampoTexto *ct = new CPigCampoTexto(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0);
+    CPigCampoSenha *ct = new CPigCampoSenha(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0);
 
     ct->SetPosicaoPadraoLabel(COMPONENTE_ESQUERDA);
     ct->SetLabel("Botão");
