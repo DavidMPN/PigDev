@@ -47,23 +47,6 @@ private:
 
     }
 
-    void DesenhaCursor(){
-
-        if (estado==COMPONENTE_EDITANDO){
-            if (cursorExibido){
-
-                DesenhaLinhaSimples(xCursor,yCursor,xCursor,yCursor+GetTamanhoFonte(fonteTexto),corCursor,idJanela);
-
-
-            }
-            if (timer&&timer->GetTempoDecorrido()>1){
-                cursorExibido = !cursorExibido;
-                timer->Reinicia(false);
-            }
-        }
-
-    }
-
     void AjustaBaseTexto(int largParcial){
 
             while(xCursor>x+larg-margemHorDir){
@@ -119,11 +102,52 @@ private:
 
     }
 
-    int TrataEventoMouse(PIG_Evento evento){
+    int CalculaAlturaEixoYLinhas(int qntLinhas){
+
+             return yBaseOriginal + ( espacoEntreLinhas*(qntLinhas-1));
+
+    }
+
+    int TrataMouseRodinha(PIG_Evento evento){
+
         std::string textoBase(texto);
         std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
 
+        if(evento.mouse.acao == MOUSE_RODINHA){
+
+            if(evento.mouse.relY == 1){
+
+                if(yBaseOriginal < yBase){
+
+                    yBase-=10;
+                    yCursor-=10;
+
+                }
+
+            }
+
+            if(evento.mouse.relY == -1){
+
+                if((yBaseOriginal + yBase) < yBaseOriginal + CalculaAlturaEixoYLinhas(linhas.size())){
+
+                    yBase+=10;
+                    yCursor+=10;
+
+                }
+
+            }
+
+            return 2;
+        }
+
+    }
+
+    int TrataMouseClick(PIG_Evento evento){
+
         if (evento.mouse.acao!=MOUSE_PRESSIONADO) return 0;
+        std::string textoBase(texto);
+        std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
+
         SDL_Point p;
         CMouse::PegaXY(p.x,p.y);
         SDL_Rect r = {x+margemHorEsq,y,larg-(margemHorEsq + margemHorDir),alt};
@@ -164,6 +188,15 @@ private:
 
             return 1;
         }
+
+
+    }
+
+    int TrataEventoMouse(PIG_Evento evento){
+
+        TrataMouseRodinha(evento);
+        TrataMouseClick(evento);
+
         return 0;
     }
 
@@ -210,7 +243,7 @@ private:
 
         }
 
-        return -1;
+        return posPercorridas - linhas[linhas.size()-1].size();
 
     }
 
@@ -293,8 +326,10 @@ public:
 
         espacoEntreLinhas = EspacoEntreLinhas;
         margemHorEsq = margemHorDir = margemVertCima = margemVertBaixo = 60;
-        yBase = y+alt-margemVertCima-GetTamanhoFonte(fonteTexto);
-        xBase = x+margemHorEsq;
+        yBaseOriginal = y+alt-margemVertCima-GetTamanhoFonte(fonteTexto);
+        xBaseOriginal = x+margemHorEsq;
+        yBase = yBaseOriginal;
+        xBase = xBaseOriginal;
         xCursor = xBase;
         yCursor = yBase;
         largMaxTexto = LargMaxTexto;
@@ -335,6 +370,8 @@ public:
         margemVertBaixo = vertBaixo;
         margemHorDir = horDir;
         margemHorEsq = horEsq;
+        yBaseOriginal = y+alt-margemVertCima-GetTamanhoFonte(fonteTexto);
+        xBaseOriginal = x+margemHorEsq;
         AjustaAlinhamento();
     }
 

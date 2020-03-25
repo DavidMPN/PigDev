@@ -41,23 +41,6 @@ void DesenhaLabel(){
 
 }
 
-void DesenhaCursor(){
-
-    if (estado==COMPONENTE_EDITANDO){
-        if (cursorExibido){
-
-            DesenhaLinhaSimples(xCursor,yCursor,xCursor,yCursor+GetTamanhoFonte(fonteTexto),corCursor,idJanela);
-
-
-        }
-        if (timer&&timer->GetTempoDecorrido()>1){
-            cursorExibido = !cursorExibido;
-            timer->Reinicia(false);
-        }
-    }
-
-}
-
 void AjustaBaseTexto(int largParcial){
 
         while(xCursor>x+larg-margemHor){

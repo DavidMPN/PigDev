@@ -8,6 +8,7 @@ protected:
     int fonteTexto,fonteLabel;
     int posCursor;
     int xBase,xCursor,yCursor,yBase;
+    int xBaseOriginal,yBaseOriginal;
     bool cursorExibido;
     int maxCaracteres;
     bool somenteNumeros;
@@ -56,6 +57,23 @@ protected:
 
         AvancaCursor();
         return 1;
+    }
+
+    void DesenhaCursor(){
+
+        if (estado==COMPONENTE_EDITANDO){
+            if (cursorExibido){
+
+                DesenhaLinhaSimples(xCursor,yCursor,xCursor,yCursor+GetTamanhoFonte(fonteTexto),corCursor,idJanela);
+
+
+            }
+            if (timer&&timer->GetTempoDecorrido()>1){
+                cursorExibido = !cursorExibido;
+                timer->Reinicia(false);
+            }
+        }
+
     }
 
 private:
