@@ -1,4 +1,5 @@
 #include "COffscreenRenderer.h"
+#include <iostream>
 
 class CMapaCaracteres{
 
@@ -42,6 +43,7 @@ private:
     }
 
     void FazGlyphs(SDL_Surface *surfaceTemp[],TTF_Font *font,int &altura,int &largura,PIG_Cor corFonte){
+
         for (Uint16 j=PRIMEIRO_CAR;j<ULTIMO_CAR;j++){
             surfaceTemp[j-PRIMEIRO_CAR] = TTF_RenderGlyph_Solid(font,(Uint16)j,corFonte);
             alturaLetra[j-PRIMEIRO_CAR] = surfaceTemp[j-PRIMEIRO_CAR]->h;
@@ -50,6 +52,7 @@ private:
             larguraLetra[j-PRIMEIRO_CAR] = surfaceTemp[j-PRIMEIRO_CAR]->w;
             largura+=surfaceTemp[j-PRIMEIRO_CAR]->w;
         }
+
     }
 
     void CriaFinal(OffscreenRenderer off,TTF_Font *font,SDL_Rect &rect,SDL_Rect &dest,bool outline,PIG_Cor corOutline,PIG_Cor *corFonte=NULL){
@@ -59,6 +62,7 @@ private:
             dest.h=alturaLetra[j-PRIMEIRO_CAR];
             rect.w=dest.w=larguraLetra[j-PRIMEIRO_CAR];
             surfaceTemp[j-PRIMEIRO_CAR] = SDL_CreateRGBSurface(0,larguraLetra[j-PRIMEIRO_CAR],alturaLetra[j-PRIMEIRO_CAR],24,0,0,0,0);
+
             SDL_BlitSurface(off->GetSurface(),&rect,surfaceTemp[j-PRIMEIRO_CAR],&dest);
             if (outline){
                 SDL_Surface *out = TTF_RenderGlyph_Solid(font,(Uint16)j,corOutline);
@@ -93,30 +97,7 @@ private:
             rect.x+=larguraLetra[j-PRIMEIRO_CAR];
         }
         SDL_RenderCopy(off->GetRenderer(),textStencil,NULL,NULL);
-    }
 
-    std::vector<std::string> ExtraiLinhasString(std::string texto,int largMax){
-        std::vector<std::string> linhas;
-        std::string linhaAtual("");
-
-        //printf("vou comecar: %s\n",texto.c_str());
-        char *pch=NULL;
-        pch = strtok((char*)texto.c_str()," .");
-        //printf("passei\n");
-        while (pch != NULL){
-            //printf("nova palavra: %s\n",pch);
-            std::string palavra(pch);
-            std::string linhaMaior = linhaAtual + " " + palavra;
-            if (GetLarguraPixelsString((char*)linhaMaior.c_str()) >largMax ){
-                linhas.push_back(linhaAtual);
-                linhaAtual = palavra;
-            }else{
-                linhaAtual = linhaMaior;
-            }
-            pch = strtok(NULL," ");
-        }
-        linhas.push_back(linhaAtual);
-        return linhas;
     }
 
 public:
@@ -216,6 +197,74 @@ public:
         free(alturaLetra);
     }
 
+    std::string SeparaPalavra(int &posAnt,std::string txt){
+
+        std::string aux = txt;
+
+        if(posAnt == txt.size()){
+            return "";
+        }
+
+        for(int i = posAnt;i<txt.size();i++){
+
+            if(txt[i] == ' '){
+                    if(i == posAnt){ // Significa que o posAnt está em cima de um espaço vazio
+
+                        posAnt+=1;
+                        return " ";
+
+
+                    }else{
+
+                        aux.assign(txt,posAnt,i - posAnt);
+                        posAnt = i;
+                        return aux;
+
+                    }
+
+            }
+
+        }
+
+        aux.assign(txt,posAnt,txt.size() - posAnt);
+        posAnt = txt.size();
+        return aux;
+
+    }
+
+    std::vector<std::string> ExtraiLinhasString(std::string texto,int largMax){
+        std::vector<std::string> linhas;
+        int posAnt=0;
+        std::string linhaAtual("");
+        std::string linhaMaior("");
+        std::string palavra = "";
+        palavra = SeparaPalavra(posAnt,texto);
+
+
+        while (palavra != ""){
+
+                linhaMaior = linhaAtual + palavra;
+
+            if (GetLarguraPixelsString((char*)linhaMaior.c_str()) >largMax){
+
+                if(linhaAtual!=""){linhas.push_back(linhaAtual);}
+                linhaAtual = palavra;
+
+            }else{
+                linhaAtual = linhaMaior;
+            }
+
+
+            palavra = SeparaPalavra(posAnt,texto);
+
+        }
+        linhas.push_back(linhaAtual);
+
+
+
+        return linhas;
+    }
+
     int GetLarguraPixelsString(char *str){
         int resp=0;
         Uint16 aux;
@@ -274,27 +323,61 @@ public:
         }
     }
 
+    int GetAlturaLetra(char letra){
+
+        Uint16 aux = letra;
+        aux = aux % 256;
+        return alturaLetra[aux-PRIMEIRO_CAR];
+
+    }
+
+    int GetLarguraLetra(char letra){
+
+        Uint16 aux = letra;
+        aux = aux % 256;
+        return larguraLetra[aux-PRIMEIRO_CAR];
+
+    }
+
+    int GetTamanhoFonte(){
+
+        return tamFonte;
+
+    }
+
     void EscreveStringLongaEsquerda(std::string texto,int x,int y,int largMax,int espacoEntreLinhas){
         SDL_Rect rectDestino;
-        int yTotal=y;
+        int linhaAtual =0;
         std::vector<std::string> linhas = ExtraiLinhasString(texto,largMax);
 
+
+
+        int altOriginal = altTela-y-tamFonte;
+
         for (int k=0;k<linhas.size();k++){
+
             rectDestino.x = x;
-            rectDestino.y = altTela-yTotal-tamFonte;
-            yTotal -= espacoEntreLinhas;
+            rectDestino.y = altOriginal;
 
             Uint16 aux;
+
             for (int i=0;i<strlen(linhas[k].c_str());i++){
+
                 aux = linhas[k][i];
-                aux = aux % 256;//UTF16 string, retirando só o byte que interessa
+                aux = aux % 256;
+
+                rectDestino.y = altOriginal + (espacoEntreLinhas*linhaAtual);
 
                 rectDestino.w = larguraLetra[aux-PRIMEIRO_CAR];
                 rectDestino.h = alturaLetra[aux-PRIMEIRO_CAR];
+
                 SDL_RenderCopy(render,glyphsT[aux-PRIMEIRO_CAR],NULL,&rectDestino);
 
                 rectDestino.x += rectDestino.w;
+
             }
+
+            linhaAtual++;
         }
     }
 
