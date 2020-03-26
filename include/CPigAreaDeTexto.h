@@ -9,13 +9,11 @@ private:
     int altLetra;
     bool linhasAbaixoTexto;
     bool marcarMargem;
+    std::vector<std::string> linhas;
 
     PIG_Cor corLinhasTexto;
 
     void AjustaBaseTexto(int largParcial){
-
-        std::string textoBase(texto);
-        std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
 
             while(xCursor>x+larg-margemHorDir){
 
@@ -34,14 +32,14 @@ private:
             while(yCursor < y + margemVertBaixo){
 
                 yBase+=5;
-                yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor(linhas));
+                yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor());
 
             }
 
             while(yCursor > y +alt - margemVertCima){
 
                 yBase-=5;
-                yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor(linhas));
+                yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor());
 
             }
 
@@ -50,14 +48,14 @@ private:
     void AjustaAlinhamento(){
 
     std::string textoBase(texto);
-    std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
+    linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
     std::string aux;
 
         xBase = x+margemHorEsq;
         yBase = y+alt-margemVertCima-GetTamanhoFonte(fonteTexto);
 
-        aux.assign(textoBase,GetPosicaoInicioDaLinhaCursor(linhas),posCursor - GetPosicaoInicioDaLinhaCursor(linhas));
-        yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor(linhas));
+        aux.assign(textoBase,GetPosicaoInicioDaLinhaCursor(),posCursor - GetPosicaoInicioDaLinhaCursor());
+        yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor());
 
         xCursor = xBase + CalculaLarguraPixels((char*)aux.c_str(),fonteTexto);
 
@@ -122,9 +120,6 @@ private:
     //Preciso no TrataEventoMouse, que vai ter que ficar como método abstrato ja que outras caixas não usam isso
     int TrataMouseRodinha(PIG_Evento evento){
 
-        std::string textoBase(texto);
-        std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
-
         if(evento.mouse.acao == MOUSE_RODINHA){
 
             if(evento.mouse.relY == 1){
@@ -158,17 +153,16 @@ private:
     int TrataMouseClickEsquerdo(PIG_Evento evento,SDL_Point p){
 
         std::string textoBase(texto);
-        std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
 
             int delta = p.x-xBase;
             int largParcial = 0;
             int largUltimaLetra = 0;
             int inicioLinhaComMouseSobre = 0;
 
-            inicioLinhaComMouseSobre = GetPosicaoInicioDaLinhaPosMouse(linhas);
+            inicioLinhaComMouseSobre = GetPosicaoInicioDaLinhaPosMouse();
 
 
-            if(delta < CalculaLarguraPixels((char*)linhas[GetLinhaComMouseEmCima(linhas)].c_str(),fonteTexto)){
+            if(delta < CalculaLarguraPixels((char*)linhas[GetLinhaComMouseEmCima()].c_str(),fonteTexto)){
 
 
                 for (int i=inicioLinhaComMouseSobre;i<=textoBase.size();i++){
@@ -191,7 +185,7 @@ private:
 
             }else{
 
-                posCursor = inicioLinhaComMouseSobre + linhas[GetLinhaComMouseEmCima(linhas)].size();
+                posCursor = inicioLinhaComMouseSobre + linhas[GetLinhaComMouseEmCima()].size();
 
             }
 
@@ -206,12 +200,12 @@ private:
     }
 
     //Uso no AjustaAlinhamento para calcular a distancia do cursor
-    int GetPosicaoInicioDaLinhaCursor(std::vector<std::string> linhas){
+    int GetPosicaoInicioDaLinhaCursor(){
         int posPercorridas = 0;
 
             for(int i=0;i<linhas.size();i++){
 
-                if(GetLinhaDoCursor(linhas) == i){
+                if(GetLinhaDoCursor() == i){
 
                     return posPercorridas;
 
@@ -226,7 +220,7 @@ private:
     }
 
     //Uso na GetPosicaoInicioDaLinhaPosMouse() para saber a linha que o mouse está em cima
-    int GetLinhaComMouseEmCima(std::vector<std::string> linhas){
+    int GetLinhaComMouseEmCima(){
         SDL_Point p;
         CMouse::PegaXY(p.x,p.y);
         int yLinha=0;
@@ -247,12 +241,12 @@ private:
     }
 
     //Uso na TrataMouseClick para calcular o inicio da linha em que o mouse está
-    int GetPosicaoInicioDaLinhaPosMouse(std::vector<std::string> linhas){
+    int GetPosicaoInicioDaLinhaPosMouse(){
         int posPercorridas = 0;
 
             for(int i=0;i<linhas.size();i++){
 
-                if(GetLinhaComMouseEmCima(linhas) == i){
+                if(GetLinhaComMouseEmCima() == i){
 
                     return posPercorridas;
 
@@ -267,7 +261,7 @@ private:
     }
 
     //Uso na AjustaAlinhamento e AjustaBase, ela me ajuda a calcular o eixo y do cursor
-    int GetLinhaDoCursor(std::vector<std::string> linhas){
+    int GetLinhaDoCursor(){
         int qntLinhas = 0;
 
         for(int i=0;i<linhas.size();i++){
@@ -393,6 +387,12 @@ public:
     void SetEspacoEntreAsLinhas(int espaco){
 
         espacoEntreLinhas = espaco + altLetra;
+
+    }
+
+    std::vector<std::string> GetLinhasTexto(){
+
+        return linhas;
 
     }
 
