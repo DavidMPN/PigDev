@@ -333,6 +333,8 @@ public:
 
     }
 
+    /*****Exclusivo da classe*****/
+
     void SetMargens(int horEsq,int horDir, int vertBaixo,int vertCima){
         margemVertCima = vertCima;
         margemVertBaixo = vertBaixo;
@@ -342,8 +344,6 @@ public:
         xBaseOriginal = x+margemHorEsq;
         AjustaAlinhamento();
     }
-
-    /*****Exclusivo da classe*****/
 
     void SetCorLinhasTexto(PIG_Cor cor){
 
