@@ -27,7 +27,7 @@ void AjustaAlinhamento(){
 std::string textoBase(texto);
 std::string aux;
 
-    xBase = x+margemHor;
+    xBase = xBaseOriginal;
 
     aux.assign(textoBase,0,posCursor);
     xCursor = xBase + CalculaLarguraPixels((char*)aux.c_str(),fonteTexto);
@@ -87,8 +87,10 @@ public:
 
 CPigCampoTexto(int idComponente,int px, int py, int alt,int larg,char *nomeArq,int fonteDoTexto = 0,int fonteDoLabel = 0,int maxCars = 200, bool apenasNumeros=false, int retiraFundo=1,int janela=0):CPigCaixaTexto(idComponente,px,py,alt,larg,nomeArq,fonteDoTexto,fonteDoLabel,maxCars,apenasNumeros,retiraFundo,janela){
 
-        yBase = y+margemVert;
-        xBase = x+margemHor;
+        yBaseOriginal = y+margemVert;
+        xBaseOriginal = x+margemHor;
+        yBase = yBaseOriginal;
+        xBase = xBaseOriginal;
         xCursor = xBase;
         yCursor = yBase;
         margemHor= margemVert = 0;

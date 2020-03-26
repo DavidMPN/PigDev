@@ -77,12 +77,7 @@ private:
 
 /*****Exclusivo da classe*****/
 
-    int CalculaAlturaEixoYLinhas(int qntLinhas){
-
-             return yBaseOriginal + ( espacoEntreLinhas*(qntLinhas-1));
-
-    }
-
+    //Preciso no TrataEventoMouse, que vai ter que ficar como método abstrato ja que outras caixas não usam isso
     int TrataMouseRodinha(PIG_Evento evento){
 
         std::string textoBase(texto);
@@ -103,7 +98,7 @@ private:
 
             if(evento.mouse.relY == -1){
 
-                if((yBaseOriginal + yBase) < yBaseOriginal + CalculaAlturaEixoYLinhas(linhas.size())){
+                if( yBase < yBaseOriginal + ( espacoEntreLinhas*(linhas.size()-1))){
 
                     yBase+=10;
                     yCursor+=10;
@@ -117,6 +112,7 @@ private:
 
     }
 
+    //Preciso no TrataEventoMouse
     int TrataMouseClick(PIG_Evento evento){
 
         if (evento.mouse.acao!=MOUSE_PRESSIONADO) return 0;
@@ -167,6 +163,7 @@ private:
 
     }
 
+    //Uso no AjustaAlinhamento para calcular a distancia do cursor
     int GetPosicaoInicioDaLinhaCursor(){
 
     int posPercorridas = 0;
@@ -190,6 +187,30 @@ private:
 
     }
 
+    //Uso na GetPosicaoInicioDaLinhaPosMouse() para saber a linha que o mouse está em cima
+    int GetLinhaComMouseEmCima(){
+    SDL_Point p;
+    CMouse::PegaXY(p.x,p.y);
+    std::string textoBase(texto);
+    std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
+    int yLinha=0;
+
+        for(int i=0;i<linhas.size();i++){
+
+            yLinha = yBase - (espacoEntreLinhas*i);
+            if(p.y > yLinha && p.y <(yLinha + espacoEntreLinhas) ){
+
+                return i;
+
+            }
+
+        }
+
+        return (linhas.size()-1);
+
+    }
+
+    //Uso na TrataMouseClick para calcular o inicio da linha em que o mouse está
     int GetPosicaoInicioDaLinhaPosMouse(){
 
     std::string textoBase(texto);
@@ -214,6 +235,7 @@ private:
 
     }
 
+    //Uso na AjustaAlinhamento e AjustaBase, ela me ajuda a calcular o eixo y do cursor
     int GetLinhaDoCursor(){
 
     std::string textoBase(texto);
@@ -236,28 +258,7 @@ private:
 
     }
 
-    int GetLinhaComMouseEmCima(){
-    SDL_Point p;
-    CMouse::PegaXY(p.x,p.y);
-    std::string textoBase(texto);
-    std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
-    int yLinha=0;
-
-        for(int i=0;i<linhas.size();i++){
-
-            yLinha = yBase - (espacoEntreLinhas*i);
-            if(p.y > yLinha && p.y <(yLinha + espacoEntreLinhas) ){
-
-                return i;
-
-            }
-
-        }
-
-        return (linhas.size()-1);
-
-    }
-
+    //Uso na Desenha, marca as margens(ajuda na hora de alinhar o texto)
     void DesenhaMarcacaoMargem(){
 
         DesenhaLinhaSimples(x+margemHorEsq,y+margemVertBaixo,x+ margemHorEsq,y+alt-margemVertCima,BRANCO);
@@ -269,6 +270,7 @@ private:
 
     }
 
+    //Uso na desenha
     void DesenhaLinhasTexto(){
 
         int yLinha = yBase;
@@ -333,8 +335,6 @@ public:
 
     }
 
-    /*****Exclusivo da classe*****/
-
     void SetMargens(int horEsq,int horDir, int vertBaixo,int vertCima){
         margemVertCima = vertCima;
         margemVertBaixo = vertBaixo;
@@ -345,12 +345,16 @@ public:
         AjustaAlinhamento();
     }
 
+    /*****Exclusivo da classe*****/
+
+    //Muda a cor das Linhas abaixo do texto
     void SetCorLinhasTexto(PIG_Cor cor){
 
         corLinhasTexto = cor;
 
     }
 
+    //Seta a Largura max do texto
     void SetLargMaxTexto(int largMax){
 
         largMaxTexto = largMax;
