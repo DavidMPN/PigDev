@@ -11,42 +11,6 @@ private:
 
     PIG_Cor corLinhasTexto;
 
-    void DesenhaLabel(){
-
-        if (strcmp(label,""))
-            int px,py;
-            switch(posLabel){
-            case COMPONENTE_CIMA:
-                EscreverCentralizada(label,x+larg/2,y+alt+5,fonteLabel);
-                break;
-            case COMPONENTE_CIMADIR:
-                EscreverDireita(label,x+larg,y+alt+5,fonteLabel);
-                break;
-            case COMPONENTE_CIMAESQ:
-                EscreverEsquerda(label,x,y+alt+5,fonteLabel);
-                break;
-            case COMPONENTE_BAIXO:
-                EscreverCentralizada(label,x+larg/2,y-30,fonteLabel);
-                break;
-            case COMPONENTE_BAIXODIR:
-                EscreverDireita(label,x+larg,y-30,fonteLabel);
-                break;
-            case COMPONENTE_BAIXOESQ:
-                EscreverEsquerda(label,x,y-30,fonteLabel);
-                break;
-            case COMPONENTE_ESQUERDA:
-                EscreverDireita(label,x-5,y+margemVertBaixo,fonteLabel);
-                break;
-            case COMPONENTE_DIREITA:
-                EscreverEsquerda(label,x+larg+5,y+margemVertBaixo,fonteLabel);
-                break;
-            case COMPONENTE_POSICAO_PERSONALIZADA:
-                EscreverEsquerda(label,x+labelX,y+labelY,fonteLabel);
-            }
-
-
-    }
-
     void AjustaBaseTexto(int largParcial){
 
             while(xCursor>x+larg-margemHorDir){
@@ -293,28 +257,28 @@ private:
 
     void DesenhaMarcacaoMargem(){
 
-    DesenhaLinhaSimples(x+margemHorEsq,y+margemVertBaixo,x+ margemHorEsq,y+alt-margemVertCima,BRANCO);
-    DesenhaLinhaSimples(x+larg-margemHorDir-1,y+margemVertBaixo,x+larg-margemHorDir-1,y+alt-margemVertCima,BRANCO);
+        DesenhaLinhaSimples(x+margemHorEsq,y+margemVertBaixo,x+ margemHorEsq,y+alt-margemVertCima,BRANCO);
+        DesenhaLinhaSimples(x+larg-margemHorDir-1,y+margemVertBaixo,x+larg-margemHorDir-1,y+alt-margemVertCima,BRANCO);
 
-    DesenhaLinhaSimples(x+margemHorEsq,y+alt-margemVertCima,x+larg-margemHorDir,y+alt-margemVertCima,BRANCO);
-    DesenhaLinhaSimples(x+margemHorEsq,y+margemVertBaixo,x+larg-margemHorDir,y+margemVertBaixo,BRANCO);
+        DesenhaLinhaSimples(x+margemHorEsq,y+alt-margemVertCima,x+larg-margemHorDir,y+alt-margemVertCima,BRANCO);
+        DesenhaLinhaSimples(x+margemHorEsq,y+margemVertBaixo,x+larg-margemHorDir,y+margemVertBaixo,BRANCO);
 
 
     }
 
     void DesenhaLinhasTexto(){
 
-    int yLinha = yBase;
-    int xLinha = x+margemHorEsq;
-    int i=0;
+        int yLinha = yBase;
+        int xLinha = x+margemHorEsq;
+        int i=0;
 
-    while(yLinha >= y + margemVertBaixo){
+        while(yLinha >= y + margemVertBaixo){
 
-        DesenhaLinhaSimples(xLinha,yLinha,xLinha+larg-margemHorDir,yLinha,corLinhasTexto);
-        i++;
-        yLinha = yBase - (espacoEntreLinhas *i);
+            DesenhaLinhaSimples(xLinha,yLinha,xLinha+larg-margemHorDir,yLinha,corLinhasTexto);
+            i++;
+            yLinha = yBase - (espacoEntreLinhas *i);
 
-    }
+        }
 
 
     }

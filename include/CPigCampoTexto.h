@@ -5,42 +5,6 @@ private:
 
 int margemHor,margemVert;
 
-void DesenhaLabel(){
-
-    if (strcmp(label,""))
-        int px,py;
-        switch(posLabel){
-        case COMPONENTE_CIMA:
-            EscreverCentralizada(label,x+larg/2,y+alt+5,fonteLabel);
-            break;
-        case COMPONENTE_CIMADIR:
-            EscreverDireita(label,x+larg,y+alt+5,fonteLabel);
-            break;
-        case COMPONENTE_CIMAESQ:
-            EscreverEsquerda(label,x,y+alt+5,fonteLabel);
-            break;
-        case COMPONENTE_BAIXO:
-            EscreverCentralizada(label,x+larg/2,y-30,fonteLabel);
-            break;
-        case COMPONENTE_BAIXODIR:
-            EscreverDireita(label,x+larg,y-30,fonteLabel);
-            break;
-        case COMPONENTE_BAIXOESQ:
-            EscreverEsquerda(label,x,y-30,fonteLabel);
-            break;
-        case COMPONENTE_ESQUERDA:
-            EscreverDireita(label,x-5,y+margemVert,fonteLabel);
-            break;
-        case COMPONENTE_DIREITA:
-            EscreverEsquerda(label,x+larg+5,y+margemVert,fonteLabel);
-            break;
-        case COMPONENTE_POSICAO_PERSONALIZADA:
-            EscreverEsquerda(label,x+labelX,y+labelY,fonteLabel);
-        }
-
-
-}
-
 void AjustaBaseTexto(int largParcial){
 
         while(xCursor>x+larg-margemHor){
