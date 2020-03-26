@@ -66,6 +66,17 @@ private:
 
     }
 
+    int TrataEventoMouse(PIG_Evento evento){
+
+        TrataMouseRodinha(evento);
+        TrataMouseClick(evento);
+
+        return 0;
+    }
+
+
+/*****Exclusivo da classe*****/
+
     int CalculaAlturaEixoYLinhas(int qntLinhas){
 
              return yBaseOriginal + ( espacoEntreLinhas*(qntLinhas-1));
@@ -154,14 +165,6 @@ private:
         }
 
 
-    }
-
-    int TrataEventoMouse(PIG_Evento evento){
-
-        TrataMouseRodinha(evento);
-        TrataMouseClick(evento);
-
-        return 0;
     }
 
     int GetPosicaoInicioDaLinhaCursor(){
@@ -283,6 +286,7 @@ private:
 
     }
 
+/**********************************/
 
 public:
 
@@ -339,6 +343,8 @@ public:
         AjustaAlinhamento();
     }
 
+    /*****Exclusivo da classe*****/
+
     void SetCorLinhasTexto(PIG_Cor cor){
 
         corLinhasTexto = cor;
@@ -357,15 +363,7 @@ public:
 
     }
 
-    int TrataEvento(PIG_Evento evento){
-
-        if (evento.tipoEvento==EVENTO_MOUSE){
-            return TrataEventoMouse(evento);
-        }else if (evento.tipoEvento==EVENTO_TECLADO){
-            return TrataEventoTeclado(evento);
-        }
-
-    }
+    /**********************************/
 
 };
 

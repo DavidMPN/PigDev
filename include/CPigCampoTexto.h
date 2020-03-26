@@ -117,16 +117,6 @@ int Desenha(){
 
 }
 
-int TrataEvento(PIG_Evento evento){
-
-    if (evento.tipoEvento==EVENTO_MOUSE){
-        return TrataEventoMouse(evento);
-    }else if (evento.tipoEvento==EVENTO_TECLADO){
-        return TrataEventoTeclado(evento);
-    }
-
-}
-
 };
 
 typedef CPigCampoTexto *PigCampoTexto;

@@ -166,9 +166,9 @@ protected:
         return resp;
     }
 
+
 public:
 
-    virtual int TrataEvento(PIG_Evento evento);
     virtual int Desenha();
 
     CPigCaixaTexto(int idComponente,int px, int py, int alt,int larg,char *nomeArq,int fonteDoTexto = 0,int fonteDoLabel = 0,int maxCars = 200,bool apenasNumeros=false,int retiraFundo=1,int janela=0):CPigComponente(idComponente,px,py,alt,larg,nomeArq,retiraFundo,janela){
@@ -236,6 +236,16 @@ public:
         }else if (estado==COMPONENTE_NORMAL){
             SDL_StopTextInput();
             if (timer) delete timer;
+        }
+
+    }
+
+    int TrataEvento(PIG_Evento evento){
+
+        if (evento.tipoEvento==EVENTO_MOUSE){
+            return TrataEventoMouse(evento);
+        }else if (evento.tipoEvento==EVENTO_TECLADO){
+            return TrataEventoTeclado(evento);
         }
 
     }

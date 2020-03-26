@@ -17,10 +17,10 @@ int xQ = 100;
 int yQ = 100;
 int larg = 300;
 int alt = 300;
-int margemHorEsq = 40;
-int margemHorDir = 60;
-int margemVertCima = 40;
-int margemVertBaixo = 90;
+int margemHorEsq = 30;
+int margemHorDir = 30;
+int margemVertCima = 30;
+int margemVertBaixo = 30;
 
 int main( int argc, char* args[] ){
 
