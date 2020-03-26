@@ -83,6 +83,32 @@ int TrataEventoMouse(PIG_Evento evento){
     return 0;
 }
 
+int TrataEventoTeclado(PIG_Evento evento){
+
+        if (evento.teclado.acao==TECLA_EDICAO){
+            return 1;
+        }else if (evento.teclado.acao==TECLA_INPUT){
+            if (AdicionaTexto((char*)ConverteString(evento.teclado.texto).c_str())){
+                if (audio>=0) PlayAudio(audio);
+                return 1;
+            }else return 0;
+        }else if (evento.teclado.acao==TECLA_PRESSIONADA){
+            switch (evento.teclado.tecla){
+            case TECLA_BACKSPACE:
+                RetiraTextoBackSpace();break;
+            case TECLA_DELETE:
+                RetiraTextoDelete();break;
+            case TECLA_DIREITA:
+                AvancaCursor();break;
+            case TECLA_ESQUERDA:
+                VoltaCursor();break;
+            }
+            return 1;
+        }
+        return 0;
+
+    }
+
 public:
 
 CPigCampoTexto(int idComponente,int px, int py, int alt,int larg,char *nomeArq,int fonteDoTexto = 0,int fonteDoLabel = 0,int maxCars = 200, bool apenasNumeros=false, int retiraFundo=1,int janela=0):CPigCaixaTexto(idComponente,px,py,alt,larg,nomeArq,fonteDoTexto,fonteDoLabel,maxCars,apenasNumeros,retiraFundo,janela){

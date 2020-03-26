@@ -6,12 +6,16 @@ private:
     int margemHorEsq,margemHorDir,margemVertCima,margemVertBaixo;
     int largMaxTexto;
     int espacoEntreLinhas;
+    int altLetra;
     bool linhasAbaixoTexto;
     bool marcarMargem;
 
     PIG_Cor corLinhasTexto;
 
     void AjustaBaseTexto(int largParcial){
+
+        std::string textoBase(texto);
+        std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
 
             while(xCursor>x+larg-margemHorDir){
 
@@ -30,28 +34,30 @@ private:
             while(yCursor < y + margemVertBaixo){
 
                 yBase+=5;
-                yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor());
+                yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor(linhas));
 
             }
 
             while(yCursor > y +alt - margemVertCima){
 
                 yBase-=5;
-                yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor());
+                yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor(linhas));
 
             }
 
     }
 
     void AjustaAlinhamento(){
+
     std::string textoBase(texto);
+    std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
     std::string aux;
 
         xBase = x+margemHorEsq;
         yBase = y+alt-margemVertCima-GetTamanhoFonte(fonteTexto);
 
-        aux.assign(textoBase,GetPosicaoInicioDaLinhaCursor(),posCursor - GetPosicaoInicioDaLinhaCursor());
-        yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor());
+        aux.assign(textoBase,GetPosicaoInicioDaLinhaCursor(linhas),posCursor - GetPosicaoInicioDaLinhaCursor(linhas));
+        yCursor = yBase - ( espacoEntreLinhas*GetLinhaDoCursor(linhas));
 
         xCursor = xBase + CalculaLarguraPixels((char*)aux.c_str(),fonteTexto);
 
@@ -68,10 +74,46 @@ private:
 
     int TrataEventoMouse(PIG_Evento evento){
 
-        TrataMouseRodinha(evento);
-        TrataMouseClick(evento);
+        SDL_Point p;
+        CMouse::PegaXY(p.x,p.y);
+        SDL_Rect r = {x+margemHorEsq,y,larg-(margemHorEsq + margemHorDir),alt};
+
+        if (SDL_PointInRect(&p,&r)){
+
+            if (evento.mouse.acao == MOUSE_RODINHA) TrataMouseRodinha(evento);
+
+            if (evento.mouse.acao == MOUSE_PRESSIONADO && evento.mouse.botao == MOUSE_ESQUERDO) TrataMouseClickEsquerdo(evento,p);
+
+
+        }
 
         return 0;
+    }
+
+    int TrataEventoTeclado(PIG_Evento evento){
+
+        if (evento.teclado.acao==TECLA_EDICAO){
+            return 1;
+        }else if (evento.teclado.acao==TECLA_INPUT){
+            if (AdicionaTexto((char*)ConverteString(evento.teclado.texto).c_str())){
+                if (audio>=0) PlayAudio(audio);
+                return 1;
+            }else return 0;
+        }else if (evento.teclado.acao==TECLA_PRESSIONADA){
+            switch (evento.teclado.tecla){
+            case TECLA_BACKSPACE:
+                RetiraTextoBackSpace();break;
+            case TECLA_DELETE:
+                RetiraTextoDelete();break;
+            case TECLA_DIREITA:
+                AvancaCursor();break;
+            case TECLA_ESQUERDA:
+                VoltaCursor();break;
+            }
+            return 1;
+        }
+        return 0;
+
     }
 
 
@@ -113,92 +155,126 @@ private:
     }
 
     //Preciso no TrataEventoMouse
-    int TrataMouseClick(PIG_Evento evento){
+    int TrataMouseClickEsquerdo(PIG_Evento evento,SDL_Point p){
 
-        if (evento.mouse.acao!=MOUSE_PRESSIONADO) return 0;
         std::string textoBase(texto);
         std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
 
-        SDL_Point p;
-        CMouse::PegaXY(p.x,p.y);
-        SDL_Rect r = {x+margemHorEsq,y,larg-(margemHorEsq + margemHorDir),alt};
-
-        if (SDL_PointInRect(&p,&r)){
             int delta = p.x-xBase;
             int largParcial = 0;
             int largUltimaLetra = 0;
             int inicioLinhaComMouseSobre = 0;
 
-            inicioLinhaComMouseSobre = GetPosicaoInicioDaLinhaPosMouse();
+            inicioLinhaComMouseSobre = GetPosicaoInicioDaLinhaPosMouse(linhas);
 
-            if(inicioLinhaComMouseSobre != -1){
 
-            for (int i=inicioLinhaComMouseSobre;i<=textoBase.size();i++){
-                std::string aux;
+            if(delta < CalculaLarguraPixels((char*)linhas[GetLinhaComMouseEmCima(linhas)].c_str(),fonteTexto)){
 
-                aux.assign(textoBase,inicioLinhaComMouseSobre,i - inicioLinhaComMouseSobre);
 
-                largParcial += CalculaLarguraPixels((char*)aux.c_str(),fonteTexto);
+                for (int i=inicioLinhaComMouseSobre;i<=textoBase.size();i++){
+                    std::string aux;
 
-                if (delta<largParcial-largUltimaLetra){
-                    posCursor = i-1;
-                    AjustaAlinhamento();
-                    return 1;
+                    aux.assign(textoBase,inicioLinhaComMouseSobre,i - inicioLinhaComMouseSobre);
+
+                    largParcial += CalculaLarguraPixels((char*)aux.c_str(),fonteTexto);
+
+                    if (delta<largParcial-largUltimaLetra){
+                        posCursor = i-1;
+                        AjustaAlinhamento();
+                        return 1;
+                    }
+
+                    largUltimaLetra = largParcial;
                 }
 
-                largUltimaLetra = largParcial;
-            }
+                posCursor = strlen(texto);
+
+            }else{
+
+                posCursor = inicioLinhaComMouseSobre + linhas[GetLinhaComMouseEmCima(linhas)].size();
 
             }
 
-            posCursor = strlen(texto);
 
             AjustaAlinhamento();
             if (estado==COMPONENTE_NORMAL)
                 DefineEstado(COMPONENTE_EDITANDO);
 
             return 1;
-        }
 
 
     }
 
     //Uso no AjustaAlinhamento para calcular a distancia do cursor
-    int GetPosicaoInicioDaLinhaCursor(){
+    int GetPosicaoInicioDaLinhaCursor(std::vector<std::string> linhas){
+        int posPercorridas = 0;
 
-    int posPercorridas = 0;
-    std::string textoBase(texto);
-    std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
+            for(int i=0;i<linhas.size();i++){
 
+                if(GetLinhaDoCursor(linhas) == i){
 
-        for(int i=0;i<linhas.size();i++){
+                    return posPercorridas;
 
-            if(GetLinhaDoCursor() == i){
+                }
 
-                return posPercorridas;
+            posPercorridas += linhas[i].size();
 
             }
 
-        posPercorridas += linhas[i].size();
-
-        }
-
-        return -1;
+            return -1;
 
     }
 
     //Uso na GetPosicaoInicioDaLinhaPosMouse() para saber a linha que o mouse está em cima
-    int GetLinhaComMouseEmCima(){
-    SDL_Point p;
-    CMouse::PegaXY(p.x,p.y);
-    std::string textoBase(texto);
-    std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
-    int yLinha=0;
+    int GetLinhaComMouseEmCima(std::vector<std::string> linhas){
+        SDL_Point p;
+        CMouse::PegaXY(p.x,p.y);
+        int yLinha=0;
+
+            for(int i=0;i<linhas.size();i++){
+
+                yLinha = yBase - (espacoEntreLinhas*i);
+                if(p.y > yLinha && p.y <(yLinha + espacoEntreLinhas) ){
+
+                    return i;
+
+                }
+
+            }
+
+            return (linhas.size()-1);
+
+    }
+
+    //Uso na TrataMouseClick para calcular o inicio da linha em que o mouse está
+    int GetPosicaoInicioDaLinhaPosMouse(std::vector<std::string> linhas){
+        int posPercorridas = 0;
+
+            for(int i=0;i<linhas.size();i++){
+
+                if(GetLinhaComMouseEmCima(linhas) == i){
+
+                    return posPercorridas;
+
+                }
+
+            posPercorridas += linhas[i].size();
+
+            }
+
+            return posPercorridas - linhas[linhas.size()-1].size();
+
+    }
+
+    //Uso na AjustaAlinhamento e AjustaBase, ela me ajuda a calcular o eixo y do cursor
+    int GetLinhaDoCursor(std::vector<std::string> linhas){
+        int qntLinhas = 0;
 
         for(int i=0;i<linhas.size();i++){
 
-            yLinha = yBase - (espacoEntreLinhas*i);
-            if(p.y > yLinha && p.y <(yLinha + espacoEntreLinhas) ){
+            qntLinhas+=linhas[i].size();
+
+            if(qntLinhas >= posCursor){
 
                 return i;
 
@@ -206,55 +282,7 @@ private:
 
         }
 
-        return (linhas.size()-1);
-
-    }
-
-    //Uso na TrataMouseClick para calcular o inicio da linha em que o mouse está
-    int GetPosicaoInicioDaLinhaPosMouse(){
-
-    std::string textoBase(texto);
-    //int linhaAtualCursor = GetLinhaDoCursor();
-    int posPercorridas = 0;
-    std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
-
-
-        for(int i=0;i<linhas.size();i++){
-
-            if(GetLinhaComMouseEmCima() == i){
-
-                return posPercorridas;
-
-            }
-
-        posPercorridas += linhas[i].size();
-
-        }
-
-        return posPercorridas - linhas[linhas.size()-1].size();
-
-    }
-
-    //Uso na AjustaAlinhamento e AjustaBase, ela me ajuda a calcular o eixo y do cursor
-    int GetLinhaDoCursor(){
-
-    std::string textoBase(texto);
-    std::vector<std::string> linhas = ExtraiLinhasString(textoBase,largMaxTexto,fonteTexto);
-    int qntLinhas = 0;
-
-    for(int i=0;i<linhas.size();i++){
-
-        qntLinhas+=linhas[i].size();
-
-        if(qntLinhas >= posCursor){
-
-            return i;
-
-        }
-
-    }
-
-    return 0;
+        return 0;
 
     }
 
@@ -294,9 +322,10 @@ public:
 
     CPigAreaDeTexto(int idComponente,int px, int py, int alt,int larg,char *nomeArq,int fonteDoTexto = 0,int fonteDoLabel = 0,int maxCars  = 200, bool apenasNumeros=false, int retiraFundo=1,int janela=0,int EspacoEntreLinhas =50,int LargMaxTexto =200,bool LinhasAbaixoTexto = false,bool marcarMargens = false):CPigCaixaTexto(idComponente,px,py,alt,larg,nomeArq,fonteDoTexto,fonteDoLabel,maxCars,apenasNumeros,retiraFundo,janela){
 
-        espacoEntreLinhas = EspacoEntreLinhas;
         margemHorEsq = margemHorDir = margemVertCima = margemVertBaixo = 60;
-        yBaseOriginal = y+alt-margemVertCima-GetTamanhoFonte(fonteTexto);
+        altLetra = GetTamanhoFonte(fonteTexto); // A altura é um vetor, mas eu preciso dela, entao eu acabei colocando como o tamanho da fonte, qualquer coisa só mudar aqui
+        espacoEntreLinhas = EspacoEntreLinhas + altLetra;
+        yBaseOriginal = y+alt-margemVertCima-altLetra;
         xBaseOriginal = x+margemHorEsq;
         yBase = yBaseOriginal;
         xBase = xBaseOriginal;
@@ -340,7 +369,7 @@ public:
         margemVertBaixo = vertBaixo;
         margemHorDir = horDir;
         margemHorEsq = horEsq;
-        yBaseOriginal = y+alt-margemVertCima-GetTamanhoFonte(fonteTexto);
+        yBaseOriginal = y+alt-margemVertCima-altLetra;
         xBaseOriginal = x+margemHorEsq;
         AjustaAlinhamento();
     }
@@ -363,7 +392,7 @@ public:
 
     void SetEspacoEntreAsLinhas(int espaco){
 
-        espacoEntreLinhas = espaco + GetTamanhoFonte(fonteTexto);
+        espacoEntreLinhas = espaco + altLetra;
 
     }
 

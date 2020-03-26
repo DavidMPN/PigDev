@@ -34,11 +34,11 @@ int main( int argc, char* args[] ){
      int fonteTexto = CriaFonteNormal("..//fontes//calibri.ttf",30,BRANCO,0,PRETO);
      int fonteLabel = CriaFonteNormal("..//fontes//calibri.ttf",15,VERDE,0,PRETO);
 
-    CPigAreaDeTexto *At = new CPigAreaDeTexto(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0,GetTamanhoFonte(fonteTexto)+30,larg - (margemHorEsq + margemHorDir),true,false);
+    CPigAreaDeTexto *At = new CPigAreaDeTexto(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0,30,larg - (margemHorEsq + margemHorDir),true,false);
 
-
-    //CPigCampoSenha *ct = new CPigCampoSenha(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0);
 /*
+    CPigCampoTexto *ct = new CPigCampoTexto(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0);
+
     ct->SetPosicaoPadraoLabel(COMPONENTE_ESQUERDA);
     ct->SetLabel("Botão");
     ct->SetTexto("teste");
