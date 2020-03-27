@@ -144,6 +144,7 @@ protected:
 
 public:
 
+
     CPigCaixaTexto(int idComponente,int px, int py, int alt,int larg,char *nomeArq,int fonteDoTexto = 0,int fonteDoLabel = 0,int maxCars = 200,bool apenasNumeros=false,int retiraFundo=1,int janela=0):CPigComponente(idComponente,px,py,alt,larg,nomeArq,retiraFundo,janela){
 
         posLabel = COMPONENTE_ESQUERDA;//posição padrão do label

@@ -78,9 +78,9 @@ private:
 
         if (SDL_PointInRect(&p,&r)){
 
-            if (evento.mouse.acao == MOUSE_RODINHA) TrataMouseRodinha(evento);
+            if (evento.mouse.acao == MOUSE_RODINHA) return TrataMouseRodinha(evento);
 
-            if (evento.mouse.acao == MOUSE_PRESSIONADO && evento.mouse.botao == MOUSE_ESQUERDO) TrataMouseClickEsquerdo(evento,p);
+            if (evento.mouse.acao == MOUSE_PRESSIONADO && evento.mouse.botao == MOUSE_ESQUERDO) return TrataMouseBotaoEsquerdo(evento,p);
 
 
         }
@@ -150,7 +150,7 @@ private:
     }
 
     //Preciso no TrataEventoMouse
-    int TrataMouseClickEsquerdo(PIG_Evento evento,SDL_Point p){
+    int TrataMouseBotaoEsquerdo(PIG_Evento evento,SDL_Point p){
 
         std::string textoBase(texto);
 
@@ -160,7 +160,6 @@ private:
             int inicioLinhaComMouseSobre = 0;
 
             inicioLinhaComMouseSobre = GetPosicaoInicioDaLinhaPosMouse();
-
 
             if(delta < CalculaLarguraPixels((char*)linhas[GetLinhaComMouseEmCima()].c_str(),fonteTexto)){
 
@@ -341,7 +340,6 @@ public:
         SDL_RenderCopyEx(renderer, text, &frame,&dest,-angulo,&pivoRelativo,flip);
 
         //bloqueia a area fora do componente
-        //SDL_Rect r={x+margemHor-2,altJanela-y-alt,larg-2*(margemHor-2),alt};
         SDL_Rect r={x+margemHorEsq,altJanela-y-alt+margemVertCima,larg-(margemHorEsq+margemHorDir),alt-(margemVertBaixo+margemVertCima)+1};
         SDL_RenderSetClipRect(renderer,&r);
 

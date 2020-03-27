@@ -100,6 +100,41 @@ private:
 
     }
 
+    std::string SeparaPalavra(int &posAnt,std::string txt){
+
+        std::string aux = txt;
+
+        if(posAnt == txt.size()){
+            return "";
+        }
+
+        for(int i = posAnt;i<txt.size();i++){
+
+            if(txt[i] == ' '){
+                    if(i == posAnt){ // Significa que o posAnt está em cima de um espaço vazio
+
+                        posAnt+=1;
+                        return " ";
+
+
+                    }else{
+
+                        aux.assign(txt,posAnt,i - posAnt);
+                        posAnt = i;
+                        return aux;
+
+                    }
+
+            }
+
+        }
+
+        aux.assign(txt,posAnt,txt.size() - posAnt);
+        posAnt = txt.size();
+        return aux;
+
+    }
+
 public:
 
     char nome[100];
@@ -197,41 +232,6 @@ public:
         free(alturaLetra);
     }
 
-    std::string SeparaPalavra(int &posAnt,std::string txt){
-
-        std::string aux = txt;
-
-        if(posAnt == txt.size()){
-            return "";
-        }
-
-        for(int i = posAnt;i<txt.size();i++){
-
-            if(txt[i] == ' '){
-                    if(i == posAnt){ // Significa que o posAnt está em cima de um espaço vazio
-
-                        posAnt+=1;
-                        return " ";
-
-
-                    }else{
-
-                        aux.assign(txt,posAnt,i - posAnt);
-                        posAnt = i;
-                        return aux;
-
-                    }
-
-            }
-
-        }
-
-        aux.assign(txt,posAnt,txt.size() - posAnt);
-        posAnt = txt.size();
-        return aux;
-
-    }
-
     std::vector<std::string> ExtraiLinhasString(std::string texto,int largMax){
         std::vector<std::string> linhas;
         int posAnt=0;
@@ -239,7 +239,6 @@ public:
         std::string linhaMaior("");
         std::string palavra = "";
         palavra = SeparaPalavra(posAnt,texto);
-
 
         while (palavra != ""){
 

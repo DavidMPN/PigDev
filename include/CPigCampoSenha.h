@@ -3,59 +3,67 @@ class CPigCampoSenha: public CPigCaixaTexto{
 
 private:
 
-int margemHor,margemVert;
-char mascara;
+    int margemHor,margemVert;
+    char mascara;
 
-void AjustaBaseTexto(int largParcial){
+    void AjustaBaseTexto(int largParcial){
 
-        while(xCursor>x+larg-margemHor){
+            while(xCursor>x+larg-margemHor){
 
-            xBase-=5;
-            xCursor = xBase + largParcial;
+                xBase-=5;
+                xCursor = xBase + largParcial;
 
-        }
+            }
 
-        while(xCursor < x+margemHor){
+            while(xCursor < x+margemHor){
 
-            xBase+=5;
-            xCursor = xBase + largParcial;
+                xBase+=5;
+                xCursor = xBase + largParcial;
 
-        }
+            }
 
-}
+    }
 
-void AjustaAlinhamento(){
-std::string textoBase = GetTextoMask();
-std::string aux;
-
-    xBase = x+margemHor;
-
-    aux.assign(textoBase,0,posCursor);
-    xCursor = xBase + CalculaLarguraPixels((char*)aux.c_str(),fonteTexto);
-
-    AjustaBaseTexto(CalculaLarguraPixels((char*)aux.c_str(),fonteTexto));
-
-
-}
-
-void EscreveTexto(){
-
-    EscreverEsquerda((char*)GetTextoMask().c_str(),xBase,yBase,fonteTexto);
-
-}
-
-int TrataEventoMouse(PIG_Evento evento){
+    void AjustaAlinhamento(){
     std::string textoBase = GetTextoMask();
+    std::string aux;
 
-    if (evento.mouse.acao!=MOUSE_PRESSIONADO) return 0;
-    SDL_Point p;
-    CMouse::PegaXY(p.x,p.y);
-    SDL_Rect r = {x+margemHor,y,larg-(2*margemHor),alt};
+        xBase = x+margemHor;
 
-    if (SDL_PointInRect(&p,&r)){
+        aux.assign(textoBase,0,posCursor);
+        xCursor = xBase + CalculaLarguraPixels((char*)aux.c_str(),fonteTexto);
+
+        AjustaBaseTexto(CalculaLarguraPixels((char*)aux.c_str(),fonteTexto));
+
+
+    }
+
+    void EscreveTexto(){
+
+        EscreverEsquerda((char*)GetTextoMask().c_str(),xBase,yBase,fonteTexto);
+
+    }
+
+    int TrataEventoMouse(PIG_Evento evento){
+
+        SDL_Point p;
+        CMouse::PegaXY(p.x,p.y);
+        SDL_Rect r = {x+margemHor,y,larg-(2 * margemHor),alt};
+
+        if (SDL_PointInRect(&p,&r)){
+
+            if (evento.mouse.acao == MOUSE_PRESSIONADO && evento.mouse.botao == MOUSE_ESQUERDO) return TrataMouseBotaoEsquerdo(evento,p);
+
+        }
+
+        return 0;
+    }
+
+    int TrataMouseBotaoEsquerdo(PIG_Evento evento,SDL_Point p){
         int delta = p.x-xBase;
         int largParcial = 0;
         int largUltimaLetra = 0;
+        std::string textoBase(GetTextoMask());
 
         for (int i=0;i<=textoBase.size();i++){
             std::string aux;
@@ -80,9 +88,9 @@ int TrataEventoMouse(PIG_Evento evento){
             DefineEstado(COMPONENTE_EDITANDO);
 
         return 1;
+
+
     }
-    return 0;
-}
 
     int TrataEventoTeclado(PIG_Evento evento){
 
@@ -112,60 +120,64 @@ int TrataEventoMouse(PIG_Evento evento){
 
 /*****Exclusivo da classe*****/
 
-std::string GetTextoMask(){
-    std::string resp;
-    for (int i=0;i<strlen(texto);i++)
-        resp += mascara;
+    std::string GetTextoMask(){
+        std::string resp;
+        for (int i=0;i<strlen(texto);i++)
+            resp += mascara;
 
-    return resp;
-}
+        return resp;
+    }
 
 /**********************************/
 
 public:
 
-CPigCampoSenha(int idComponente,int px, int py, int alt,int larg,char *nomeArq,int fonteDoTexto = 0,int fonteDoLabel = 0,int maxCars = 200, bool apenasNumeros=false, int retiraFundo=1,int janela=0):CPigCaixaTexto(idComponente,px,py,alt,larg,nomeArq,fonteDoTexto,fonteDoLabel,maxCars,apenasNumeros,retiraFundo,janela){
+    CPigCampoSenha(int idComponente,int px, int py, int alt,int larg,char *nomeArq,int fonteDoTexto = 0,int fonteDoLabel = 0,int maxCars = 200, bool apenasNumeros=false, int retiraFundo=1,int janela=0):CPigCaixaTexto(idComponente,px,py,alt,larg,nomeArq,fonteDoTexto,fonteDoLabel,maxCars,apenasNumeros,retiraFundo,janela){
 
-        yBase = y+margemVert;
-        xBase = x+margemHor;
-        xCursor = xBase;
-        yCursor = yBase;
-        margemHor= margemVert = 0;
-        mascara = '*';
+            yBase = y+margemVert;
+            xBase = x+margemHor;
+            xCursor = xBase;
+            yCursor = yBase;
+            margemHor= margemVert = 0;
+            mascara = '*';
 
-}
-
-~CPigCampoSenha(){
-    if (timer) delete timer;
-}
-
-int Desenha(){
-    //imagem de fundo
-    SDL_RenderCopyEx(renderer, text, &frame,&dest,-angulo,&pivoRelativo,flip);
-
-    //SDL_Rect r={x+margemHor-2,altJanela-y-alt,larg-2*(margemHor-2),alt};
-    SDL_Rect r={x+margemHor,altJanela-y-alt+margemVert,larg-(2*margemHor),alt-(2*margemVert)+1};
-    SDL_RenderSetClipRect(renderer,&r);
-
-    EscreveTexto();
-    DesenhaCursor();
-
-    //desbloqueia o desenho fora da area do componente
-    SDL_RenderSetClipRect(renderer,NULL);
-
-    DesenhaLabel();
-
-}
-
-int TrataEvento(PIG_Evento evento){
-
-    if (evento.tipoEvento==EVENTO_MOUSE){
-        return TrataEventoMouse(evento);
-    }else if (evento.tipoEvento==EVENTO_TECLADO){
-        return TrataEventoTeclado(evento);
     }
 
-}
+    ~CPigCampoSenha(){
+        if (timer) delete timer;
+    }
+
+    int Desenha(){
+        //imagem de fundo
+        SDL_RenderCopyEx(renderer, text, &frame,&dest,-angulo,&pivoRelativo,flip);
+
+        //SDL_Rect r={x+margemHor-2,altJanela-y-alt,larg-2*(margemHor-2),alt};
+        SDL_Rect r={x+margemHor,altJanela-y-alt+margemVert,larg-(2*margemHor),alt-(2*margemVert)+1};
+        SDL_RenderSetClipRect(renderer,&r);
+
+        EscreveTexto();
+        DesenhaCursor();
+
+        //desbloqueia o desenho fora da area do componente
+        SDL_RenderSetClipRect(renderer,NULL);
+
+        DesenhaLabel();
+
+    }
+
+    void SetMargens(int margHor,int margVert){
+
+        margemHor = margHor;
+        margemVert = margVert;
+        yBaseOriginal = y+margemVert;
+        xBaseOriginal = x+margemHor;
+        yBase = yBaseOriginal;
+        xBase = xBaseOriginal;
+        xCursor = xBase;
+        yCursor = yBase;
+        AjustaAlinhamento();
+
+    }
 
 };
 
