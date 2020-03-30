@@ -1,0 +1,5 @@
+{
+    "code-runner.executorMap": {
+        "cpp": "g++ -Wall -fexceptions -march=core2 -O3 -std=c++11 -w -I ./include -I ./include/SDL -I ./include/SDL_image -I ./include/video -c ./src/main.cpp -o ./obj/main.o && g++ -L ./lib -o ./bin/Projeto.exe ./obj/main.o  -lmingw32 -lSDL2main -lSDL2  -lSDL2_net  -lSDL2_image -lSDL2_ttf -lSDL2_mixer  ./lib/libavformat.dll.a ./lib/libavcodec.dll.a ./lib/libswresample.dll.a ./lib/libswscale.dll.a ./lib/libavutil.dll.a ./lib/libavdevice.dll.a ./lib/libavfilter.dll.a ./lib/libpostproc.dll.a && ./bin/Projeto.exe"
+    }
+}
