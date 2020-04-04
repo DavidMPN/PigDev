@@ -1,5 +1,4 @@
 #include "COffscreenRenderer.h"
-#include <iostream>
 
 class CMapaCaracteres{
 
@@ -100,35 +99,43 @@ private:
 
     }
 
+    std::string TrataQuebraLinhaSeparaPalavra(int posAtual,int &posAnt,std::string txt){
+        std::string aux;
+
+        if(posAtual == posAnt){
+            posAnt+=1;
+            return "\n";
+        }
+
+        aux.assign(txt,posAnt,posAtual - posAnt);
+        posAnt = posAtual;
+        return aux;
+
+   }
+
+    std::string TrataEspacoVazioSeparaPalavra(int posAtual,int &posAnt,std::string txt){
+        std::string aux;
+
+        if(posAtual == posAnt){
+            posAnt+=1;
+            return " ";
+        }
+        aux.assign(txt,posAnt,posAtual - posAnt);
+        posAnt = posAtual;
+        return aux;
+
+   }
+
     std::string SeparaPalavra(int &posAnt,std::string txt){
 
-        std::string aux = txt;
-
-        if(posAnt == txt.size()){
-            return "";
-        }
+        if(posAnt == txt.size()) return "";
 
         for(int i = posAnt;i<txt.size();i++){
-
-            if(txt[i] == ' '){
-                    if(i == posAnt){ // Significa que o posAnt está em cima de um espaço vazio
-
-                        posAnt+=1;
-                        return " ";
-
-
-                    }else{
-
-                        aux.assign(txt,posAnt,i - posAnt);
-                        posAnt = i;
-                        return aux;
-
-                    }
-
-            }
-
+            if(txt[i] == '\n') return TrataQuebraLinhaSeparaPalavra(i,posAnt,txt);
+            if(txt[i] == ' ') return TrataEspacoVazioSeparaPalavra(i,posAnt,txt);
         }
 
+        std::string aux;
         aux.assign(txt,posAnt,txt.size() - posAnt);
         posAnt = txt.size();
         return aux;
@@ -234,33 +241,41 @@ public:
 
     std::vector<std::string> ExtraiLinhasString(std::string texto,int largMax){
         std::vector<std::string> linhas;
-        int posAnt=0;
         std::string linhaAtual("");
         std::string linhaMaior("");
         std::string palavra = "";
+        int posAnt=0;
+
+        const std::string QUEBRALINHA = "\n";
+
         palavra = SeparaPalavra(posAnt,texto);
 
         while (palavra != ""){
 
-                linhaMaior = linhaAtual + palavra;
+            linhaMaior = linhaAtual + palavra;
 
-            if (GetLarguraPixelsString((char*)linhaMaior.c_str()) >largMax){
-
-                if(linhaAtual!=""){linhas.push_back(linhaAtual);}
-                linhaAtual = palavra;
-
+            if(palavra == QUEBRALINHA){
+                linhas.push_back(linhaAtual);
+                linhaAtual = QUEBRALINHA;
             }else{
-                linhaAtual = linhaMaior;
+
+                if (GetLarguraPixelsString((char*)linhaMaior.c_str()) >largMax){
+
+                    if(linhaAtual == QUEBRALINHA){
+                        linhas.push_back(linhaMaior);
+                        linhaAtual ="";
+                    }else{
+                        if(linhaAtual!=""){linhas.push_back(linhaAtual);}
+                        linhaAtual = palavra;
+                    }
+
+                }else{
+                    linhaAtual = linhaMaior;
+                }
             }
-
-
             palavra = SeparaPalavra(posAnt,texto);
-
         }
         linhas.push_back(linhaAtual);
-
-
-
         return linhas;
     }
 
@@ -271,7 +286,7 @@ public:
         for (int i=0;i<strlen(str);i++){
             aux = str[i];
             aux = aux % 256;
-            resp += larguraLetra[aux-PRIMEIRO_CAR];
+            if(str[i] != '\n')resp += larguraLetra[aux-PRIMEIRO_CAR];
         }
 
         return resp;
@@ -349,8 +364,6 @@ public:
         int linhaAtual =0;
         std::vector<std::string> linhas = ExtraiLinhasString(texto,largMax);
 
-
-
         int altOriginal = altTela-y-tamFonte;
 
         for (int k=0;k<linhas.size();k++){
@@ -362,17 +375,21 @@ public:
 
             for (int i=0;i<strlen(linhas[k].c_str());i++){
 
-                aux = linhas[k][i];
-                aux = aux % 256;
+                if(linhas[k][i] != '\n'){
 
-                rectDestino.y = altOriginal + (espacoEntreLinhas*linhaAtual);
+                    aux = linhas[k][i];
+                    aux = aux % 256;
 
-                rectDestino.w = larguraLetra[aux-PRIMEIRO_CAR];
-                rectDestino.h = alturaLetra[aux-PRIMEIRO_CAR];
+                    rectDestino.y = altOriginal + (espacoEntreLinhas*linhaAtual);
 
-                SDL_RenderCopy(render,glyphsT[aux-PRIMEIRO_CAR],NULL,&rectDestino);
+                    rectDestino.w = larguraLetra[aux-PRIMEIRO_CAR];
+                    rectDestino.h = alturaLetra[aux-PRIMEIRO_CAR];
 
-                rectDestino.x += rectDestino.w;
+                    SDL_RenderCopy(render,glyphsT[aux-PRIMEIRO_CAR],NULL,&rectDestino);
+
+                    rectDestino.x += rectDestino.w;
+
+                }
 
             }
 

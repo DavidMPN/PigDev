@@ -3,8 +3,7 @@
 #include "CPigComponente.h"
 #include "CPigBotao.h"
 #include "CPigCaixaTexto.h"
-#include "CPigCampoTexto.h"
-#include "CPigCampoSenha.h"
+#include "CPigCampoTextoESenha.h"
 #include "CPigAreaDeTexto.h"
 #include "CPigCheckBox.h"
 
@@ -31,32 +30,32 @@ int main( int argc, char* args[] ){
     //associando o teclado (basta uma única vez) com a variável meuTeclado
     meuTeclado = GetTeclado();
 
-     int fonteTexto = CriaFonteNormal("..//fontes//calibri.ttf",30,BRANCO,0,PRETO);
+     int fonteTexto = CriaFonteNormal("..//fontes//calibri.ttf",30,PRETO,0,PRETO);
      int fonteLabel = CriaFonteNormal("..//fontes//calibri.ttf",15,VERDE,0,PRETO);
 
-    //CPigAreaDeTexto *At = new CPigAreaDeTexto(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0,30,larg - (margemHorEsq + margemHorDir),true,false);
+    CPigAreaDeTexto *At = new CPigAreaDeTexto(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0,0,larg - (margemHorEsq + margemHorDir),true,false);
+    //CPigCampoTextoESenha *ct = new CPigCampoTextoESenha(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0,false);
 
-    CPigCampoSenha *ct = new CPigCampoSenha(9,x,y,alt,larg,"caixa.png",fonteTexto,fonteLabel,400,false,0,0);
-
+/*
     ct->SetPosicaoPadraoLabel(COMPONENTE_ESQUERDA);
     ct->SetLabel("Botão");
     ct->SetTexto("teste");
     ct->SetCorCursor(BRANCO);
-    ct->SetMargens(30,30);
+    ct->SetMargens(30,30,30,30);
+*/
 
-/*
     At->SetLabel("Botão");
     //At->SetFonteLabel(0);
     At->SetTexto("teste");
-    At->SetCorCursor(BRANCO);
+    At->SetCorCursor(PRETO);
 
-    At->SetCorLinhasTexto(AZUL);
+   // At->SetCorLinhasTexto(AZUL);
    // At->SetLargMaxTexto(150);
     At->SetMargens(margemHorEsq,margemHorDir,margemVertBaixo,margemVertCima);
 //    At->SetLargMotaxTexto();
     At->SetEspacoEntreAsLinhas(0);
 
-*/
+
     while(JogoRodando()){
 
         //pega um evento que tenha ocorrido desde a última passada do loop
@@ -81,15 +80,15 @@ int main( int argc, char* args[] ){
 */
 
 
-        ct->TrataEvento(evento);
+        //ct->TrataEvento(evento);
 
-        //At->TrataEvento(evento);
+        At->TrataEvento(evento);
 
         IniciaDesenho();
 
         //todas as chamadas de desenho devem ser feitas aqui na ordem desejada
-       ct->Desenha();
-       // At->Desenha();
+       //ct->Desenha();
+        At->Desenha();
 
         //o frame totalmente pronto será mostrado na tela
         EncerraDesenho();
